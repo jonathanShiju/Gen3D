@@ -1,0 +1,16 @@
+[submodule "TRELLIS-image-large"]
+    path = TRELLIS-image-large
+    url = https://huggingface.co/JeffreyXiang/TRELLIS-image-large
+
+[submodule "TRELLIS-text-base"]
+    path = TRELLIS-text-base
+    url = https://huggingface.co/JeffreyXiang/TRELLIS-text-base
+
+[submodule "TRELLIS-text-large"]
+    path = TRELLIS-text-large
+    url = https://huggingface.co/JeffreyXiang/TRELLIS-text-large
+
+[submodule "TRELLIS-text-xlarge"]
+    path = TRELLIS-text-xlarge
+    url = https://huggingface.co/JeffreyXiang/TRELLIS-text-xlarge
+
