@@ -108,9 +108,7 @@ class Trellis_ModelGeneration:
         Args:
         model (ModelInit): The configuration object containing the model parameters.
         """
-        # Set sparse convolution algorithm to native to optimize model generation
-        os.environ['SPCONV_ALGO'] = 'native'
-
+        
         # Construct model path based on model type and size (e.g., 'TRELLIS-image-large')
         self.model_path = f'TRELLIS-{model.model_type}-{model.model_size}'
 

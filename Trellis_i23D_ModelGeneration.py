@@ -9,6 +9,10 @@ Last Modified: 16-04-2025
 """
 
 import os
+# Set sparse convolution algorithm to native to optimize model generation
+os.environ['SPCONV_ALGO'] = 'native'
+os.environ['ATTN_BACKEND'] = 'xformers'
+
 from pathlib import Path
 from typing import *
 from Trellis_ModelGeneration import Trellis_ModelGeneration, ModelInit, RunConfig, ExportGLBConfig

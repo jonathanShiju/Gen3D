@@ -403,6 +403,7 @@ def to_glb(
     fill_holes: bool = True,
     fill_holes_max_size: float = 0.04,
     texture_size: int = 1024,
+    mode: Literal['opt', 'fast'] = 'opt',
     debug: bool = False,
     verbose: bool = True,
 ) -> trimesh.Trimesh:
@@ -447,7 +448,7 @@ def to_glb(
     texture = bake_texture(
         vertices, faces, uvs,
         observations, masks, extrinsics, intrinsics,
-        texture_size=texture_size, mode='opt',
+        texture_size=texture_size, mode=mode,
         lambda_tv=0.01,
         verbose=verbose
     )

@@ -1,13 +1,13 @@
-# Use the official PyTorch image with CUDA 12.4 and cuDNN 9 for GPU acceleration
-FROM pytorch/pytorch:2.4.1-cuda12.4-cudnn9-devel
+# Use PyTorch base image with CUDA 12.1
+FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn8-runtime
 
 # Set the working directory to the root
 WORKDIR /
 
-# Set the CUDA architecture for PyTorch, targeting various GPU compute capabilities
-ENV TORCH_CUDA_ARCH_LIST=8.0;8.6;8.7;8.9
+# Set the CUDA architecture for PyTorch, targeting Volta (7.5) and Ampere (8.0, 8.6, 8.7, 8.9)
+ENV TORCH_CUDA_ARCH_LIST="7.5;8.0;8.6;8.7;8.9"
 
-# Install essential system packages and libraries needed for building and running Python packages
+# Install essential system packages
 RUN apt update \
  && apt-get install -yq --no-install-recommends \
     git \
@@ -32,10 +32,10 @@ RUN apt update \
     cmake \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip to the latest version
+# Upgrade pip
 RUN pip install --upgrade pip
 
-# Install basic Python libraries required for image processing, 3D visualization, and other functionalities
+# Install basic Python libraries
 RUN pip install \
     pillow \
     imageio \
@@ -55,23 +55,23 @@ RUN pip install \
     rembg \
     pydantic 
 
-RUN pip install torch==2.4.1+cu124 torchvision --index-url https://download.pytorch.org/whl/cu124
+# Install PyTorch and related libraries for CUDA 12.1
+RUN pip install xformers torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
 # Install utils3d from a specific Git commit
 RUN pip install git+https://github.com/EasternJournalist/utils3d.git@9a4eb15e4021b67b12c460c7057d642626897ec8
 
-# Install Open3D library, ignoring previously installed versions
+# Install Open3D, ignoring previous installations
 RUN pip install --ignore-installed open3d
 
-# Install xformers, Flash Attention, and nvdiffrast libraries from external sources
-RUN pip install xformers==0.0.28.post1 --index-url https://download.pytorch.org/whl/cu124 && \
-    pip install flash-attn && \
+# Install flash-attn and nvdiffrast
+RUN pip install flash-attn && \
     pip install git+https://github.com/NVlabs/nvdiffrast.git
 
-# Install Kaolin, a library for deep learning on 3D data, for PyTorch 2.4.1 with CUDA 12.4
-RUN pip install kaolin==0.17.0 -f https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-2.4.1_cu124.html
+# Install Kaolin for deep learning on 3D data (ensure compatibility with CUDA 12.1)
+RUN pip install kaolin==0.17.0 -f https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-2.5.1_cu121.html
 
-# Set environment variables for CUDA and C++17 flags for building certain packages
+# Set environment variables for CUDA
 ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=$CUDA_HOME/bin:$PATH
 ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
@@ -89,13 +89,13 @@ RUN git clone https://github.com/autonomousvision/mip-splatting.git /tmp/extensi
 COPY extensions/vox2seq /tmp/extensions/vox2seq
 RUN pip install /tmp/extensions/vox2seq
 
-# Install SpConv (sparse convolution library) for CUDA 12.0 and Jupyter notebook
+# Install SpConv (sparse convolution library) for CUDA 12.0
 RUN pip install spconv-cu120 
 
 # Set the working directory to /workspace
 WORKDIR /workspace
 
-# Copy Trellis-related files into the container
+# Copy necessary Trellis-related files into the container
 COPY trellis ./trellis 
 COPY TRELLIS-image-large ./TRELLIS-image-large
 COPY Trellis_i23D_ModelGeneration.py .
@@ -105,12 +105,12 @@ COPY TRELLIS-text-large ./TRELLIS-text-large
 COPY TRELLIS-text-xlarge ./TRELLIS-text-xlarge
 COPY Trellis_t23D_ModelGeneration.py .
 
-# RUN useradd -ms /bin/bash user 
-# # Change ownership of the app files to the non-root user
+# Optional: Create and use non-root user for better security
+# RUN useradd -ms /bin/bash user
 # RUN chown -R user:user /workspace
 # USER user
 # RUN mkdir -p /home/user/.cache
 
-# # Create a directory for volumes and declare the volume for external access
-# RUN mkdir /workspace/Volume
-# VOLUME ["/workspace/Volume"]
+# Optional: Create a directory for volumes and declare a volume for external access
+RUN mkdir /workspace/Volume
+VOLUME ["/workspace/Volume"]
